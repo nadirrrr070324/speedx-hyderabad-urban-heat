@@ -42,9 +42,9 @@ export default function Overview({ zone, risk, profile, cloud, setCloud, onCheck
 
   return (
     <div className="mx-auto max-w-[1440px] space-y-4 px-3 py-4 sm:px-5">
-      {/* AREA SEARCH — explore any Hyderabad location */}
+      {/* AREA SEARCH — explore any location worldwide */}
       <Card className="p-4">
-        <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-2">SEARCH ANY AREA IN HYDERABAD</p>
+        <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-2">SEARCH ANY CITY OR AREA WORLDWIDE</p>
         <AreaSearch onSelect={(z) => { onAreaSelect?.(z); setZone(z.id); }} />
         <p className="mt-2 text-[10px] text-slate-400">Currently viewing: <b className="text-navy">{zone.name}</b> · {zone.ward}</p>
       </Card>

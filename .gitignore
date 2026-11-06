@@ -5,3 +5,4 @@ __pycache__/
 .env
 .andromity/
 .agent-cache/
+.vercel

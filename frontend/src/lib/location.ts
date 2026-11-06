@@ -75,3 +75,23 @@ export async function reverseLabel(lat: number, lng: number): Promise<string | n
     return null;
   }
 }
+
+// Forward-geocode any place name to coordinates (no key). Returns up to 8 results.
+export async function forwardGeocode(q: string): Promise<Array<{ city: string; locality: string; principalSubdivision: string; countryName: string; latitude: number; longitude: number }>> {
+  try {
+    const r = await fetch(`https://api.bigdatacloud.net/data/forward-geocode-client?q=${encodeURIComponent(q)}&localityLanguage=en`, { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) return [];
+    const j = await r.json();
+    if (!Array.isArray(j)) return [];
+    return j.slice(0, 8).map((x: any) => ({
+      city: x.city,
+      locality: x.locality,
+      principalSubdivision: x.principalSubdivision,
+      countryName: x.countryName,
+      latitude: x.latitude,
+      longitude: x.longitude,
+    }));
+  } catch {
+    return [];
+  }
+}

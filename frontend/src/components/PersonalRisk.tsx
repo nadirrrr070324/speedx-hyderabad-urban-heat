@@ -13,7 +13,7 @@ const CONDS = ['Diabetes', 'Hypertension', 'Heart condition', 'Asthma / Respirat
 export default function PersonalRisk({ profile, setProfile, zone, zones }: {
   profile: Profile; setProfile: (p: Profile) => void; zone: Zone; zones: Zone[];
 }) {
-  const { t, settings } = useA11y();
+  const { t } = useA11y();
   const [consent, setConsent] = useState(false);
   const risk: RiskBreakdown = useMemo(() => assessRisk(profile, zone), [profile, zone]);
   const recs = useMemo(() => buildRecommendations(profile, zone, risk), [profile, zone, risk]);

@@ -1,0 +1,23 @@
+{
+  "name": "stitch_urban_heat_intelligence_platform",
+  "private": true,
+  "version": "1.0.0",
+  "description": "SPEEDX — Hyderabad Urban Heat Observatory. Next Generation Climate Intelligence.",
+  "scripts": {
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "build:backend": "pip install -r backend/requirements.txt",
+    "dev": "npm run dev:frontend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "uvicorn backend.app.main:app --reload --port 8000",
+    "preview": "npm run preview:frontend",
+    "preview:frontend": "npm run preview --prefix frontend",
+    "install:all": "npm install --prefix frontend && pip install -r backend/requirements.txt"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "vercel": "^65.12.1"
+  }
+}

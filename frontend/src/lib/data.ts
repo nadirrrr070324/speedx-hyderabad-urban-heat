@@ -76,3 +76,37 @@ export function demoForecast(zone: Zone): ForecastDay[] {
     };
   });
 }
+// Hyderabad neighborhoods available for search (DEMO coordinates; measurements come from live weather when online).
+export interface AreaHit { id: string; name: string; ward: string; lat: number; lng: number; area: string; }
+export const HYDERABAD_AREAS: AreaHit[] = [
+  { id: 'banjara-hills', name: 'Banjara Hills', ward: 'Banjara Hills', lat: 17.4126, lng: 78.4482, area: 'Upscale residential — tree canopy, moderate heat' },
+  { id: 'jubilee-hills', name: 'Jubilee Hills', ward: 'Jubilee Hills', lat: 17.4326, lng: 78.4071, area: 'Hilly residential — cooler microclimate' },
+  { id: 'hitec-city', name: 'HITEC City', ward: 'Madhapur / HITEC City', lat: 17.4435, lng: 78.3772, area: 'IT hub — glass towers' },
+  { id: 'gachibowli', name: 'Gachibowli', ward: 'Gachibowli', lat: 17.4401, lng: 78.3489, area: 'IT corridor — expanding built-up' },
+  { id: 'kondapur', name: 'Kondapur', ward: 'Kondapur', lat: 17.4603, lng: 78.3630, area: 'Residential — mixed use' },
+  { id: 'miyapur', name: 'Miyapur', ward: 'Miyapur', lat: 17.4960, lng: 78.3540, area: 'Suburban — growing density' },
+  { id: 'kukatpally', name: 'Kukatpally', ward: 'Kukatpally', lat: 17.4849, lng: 78.4138, area: 'Dense residential' },
+  { id: 'ameerpet', name: 'Ameerpet', ward: 'Ameerpet', lat: 17.4374, lng: 78.4483, area: 'Commercial hub — high footfall' },
+  { id: 'begumpet', name: 'Begumpet', ward: 'Begumpet', lat: 17.4440, lng: 78.4680, area: 'Mixed residential/commercial' },
+  { id: 'abids', name: 'Abids', ward: 'Abids', lat: 17.3930, lng: 78.4750, area: 'Central business district' },
+  { id: 'lb-nagar', name: 'LB Nagar', ward: 'LB Nagar', lat: 17.3457, lng: 78.5522, area: 'Eastern residential' },
+  { id: 'uppal', name: 'Uppal', ward: 'Uppal', lat: 17.3990, lng: 78.5590, area: 'Eastern corridor' },
+  { id: 'dilsukhnagar', name: 'Dilsukhnagar', ward: 'Dilsukhnagar', lat: 17.3680, lng: 78.5240, area: 'Dense commercial/residential' },
+  { id: 'tolichowki', name: 'Tolichowki', ward: 'Tolichowki', lat: 17.3930, lng: 78.4220, area: 'Mixed residential' },
+  { id: 'mehdipatnam', name: 'Mehdipatnam', ward: 'Mehdipatnam', lat: 17.3960, lng: 78.4390, area: 'Commercial — busy junction' },
+  { id: 'old-city', name: 'Old City (Charminar)', ward: 'Ward 72 Charminar', lat: 17.3616, lng: 78.4747, area: 'Historic dense core' },
+  { id: 'secunderabad', name: 'Secunderabad', ward: 'Secunderabad Cantonment', lat: 17.4399, lng: 78.4983, area: 'Rail hub' },
+  { id: 'trimulgherry', name: 'Trimulgherry', ward: 'Trimulgherry', lat: 17.4660, lng: 78.5050, area: 'Cantonment' },
+  { id: 'alwal', name: 'Alwal', ward: 'Alwal', lat: 17.4960, lng: 78.5120, area: 'Northern suburb' },
+  { id: 'medchal', name: 'Medchal', ward: 'Medchal', lat: 17.6260, lng: 78.4810, area: 'Peri-urban' },
+  { id: 'shamshabad', name: 'Shamshabad', ward: 'Shamshabad', lat: 17.2543, lng: 78.4242, area: 'Airport zone' },
+  { id: 'lingampally', name: 'Lingampally', ward: 'Lingampally', lat: 17.4840, lng: 78.3180, area: 'Western suburb' },
+  { id: 'manikonda', name: 'Manikonda', ward: 'Manikonda', lat: 17.4010, lng: 78.3880, area: 'Residential — IT proximity' },
+  { id: 'nallagandla', name: 'Nallagandla', ward: 'Nallagandla', lat: 17.4710, lng: 78.3100, area: 'New residential' },
+  { id: 'tellapur', name: 'Tellapur', ward: 'Tellapur', lat: 17.4880, lng: 78.2780, area: 'Peri-urban' },
+  { id: 'kokapet', name: 'Kokapet', ward: 'Kokapet', lat: 17.3890, lng: 78.3280, area: 'High-rise zone' },
+  { id: 'financial-district', name: 'Financial District', ward: 'Nanakramguda', lat: 17.4160, lng: 78.3380, area: 'Corporate — glass towers' },
+  { id: 'raidurg', name: 'Raidurg', ward: 'Raidurg', lat: 17.4300, lng: 78.3800, area: 'IT/business' },
+  { id: 'kbr-park', name: 'KBR Park', ward: 'Banjara Hills / KBR Park', lat: 17.4222, lng: 78.4257, area: 'Parkland — cool island' },
+];
+

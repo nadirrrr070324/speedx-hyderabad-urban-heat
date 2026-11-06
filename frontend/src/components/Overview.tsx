@@ -6,6 +6,7 @@ import { wmoLabel } from '../lib/weather';
 import { CLOUD_STATES } from '../lib/cloud';
 import { Card, DemoBadge, RiskPill, SectionTitle, Bar } from './ui';
 import { useA11y } from '../lib/a11y';
+import AreaSearch from './AreaSearch';
 import ThermalRadar from './ThermalRadar';
 import CloudSky from './CloudSky';
 
@@ -18,6 +19,7 @@ interface Props {
   onCheckRisk: () => void;
   onExplore3D: () => void;
   setZone: (id: string) => void;
+  onAreaSelect?: (zone: any) => void;
   zones: Zone[];
   liveWeather?: LiveWeather | null;
   liveForecast?: ForecastDay[];
@@ -29,7 +31,7 @@ interface Props {
   onRefresh?: () => void;
 }
 
-export default function Overview({ zone, risk, profile, cloud, setCloud, onCheckRisk, onExplore3D, setZone, zones, liveWeather, liveLoading, liveUpdated, autoCloud, setAutoCloud, onRefresh }: Props) {
+export default function Overview({ zone, risk, profile, cloud, setCloud, onCheckRisk, onExplore3D, setZone, zones, onAreaSelect, liveWeather, liveLoading, liveUpdated, autoCloud, setAutoCloud, onRefresh }: Props) {
   const { t } = useA11y();
   const e = zone.env;
   const live = e.source === 'Open-Meteo (live)';
@@ -40,7 +42,31 @@ export default function Overview({ zone, risk, profile, cloud, setCloud, onCheck
 
   return (
     <div className="mx-auto max-w-[1440px] space-y-4 px-3 py-4 sm:px-5">
-      {/* HERO + METRIC GRID */}
+      {/* AREA SEARCH — explore any Hyderabad location */}
+      <Card className="p-4">
+        <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-2">SEARCH ANY AREA IN HYDERABAD</p>
+        <AreaSearch onSelect={(z) => { onAreaSelect?.(z); setZone(z.id); }} />
+        <p className="mt-2 text-[10px] text-slate-400">Currently viewing: <b className="text-navy">{zone.name}</b> · {zone.ward}</p>
+      </Card>
+
+      {/* QUICK SUMMARY — 3 questions */}
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Card className="p-4">
+          <p className="text-[10px] font-bold tracking-widest text-slate-400">1. WHAT'S HAPPENING?</p>
+          <p className="font-headline mt-1 text-2xl font-extrabold text-navy">{zone.env.heatIndex.toFixed(1)}°C</p>
+          <p className="text-xs text-slate-600">Heat index · {zone.name}</p>
+        </Card>
+        <Card className="p-4">
+          <p className="text-[10px] font-bold tracking-widest text-slate-400">2. AM I AT RISK?</p>
+          <p className="font-headline mt-1 text-2xl font-extrabold text-navy">{risk.total}/100</p>
+          <p className="text-xs text-slate-600">{risk.tier} personal risk</p>
+        </Card>
+        <Card className="p-4">
+          <p className="text-[10px] font-bold tracking-widest text-slate-400">3. WHAT SHOULD I DO?</p>
+          <p className="mt-1 text-xs font-semibold text-navy">Avoid outdoor work 11:00–16:00</p>
+          <p className="text-xs text-slate-600">Safer window: before 10:30 AM</p>
+        </Card>
+      </div>
       <div className="grid gap-4 xl:grid-cols-5">
         <Card className="relative overflow-hidden xl:col-span-3">
           <CloudSky cloud={cloud} className="opacity-80" />

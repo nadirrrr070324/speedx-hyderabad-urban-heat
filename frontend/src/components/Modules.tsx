@@ -3,12 +3,15 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { MapPin, Search, Building2, Users, TreePine, Droplets, HardHat, Clock, ShieldCheck } from 'lucide-react';
 import type { Zone, Profile, ForecastDay } from '../lib/types';
 import { FACILITIES, demoForecast } from '../lib/data';
+import { haversineKm } from '../lib/location';
+import { ZONES } from '../lib/data';
 import { assessRisk } from '../lib/risk';
 import { Card, DemoBadge, SectionTitle, RiskPill, Bar as BarRow } from './ui';
 import ThermalGISMap, { type MapLayer } from './ThermalGISMap';
+import AreaSearch from './AreaSearch';
 
 /* ---------- Thermal GIS (real Leaflet map + multi-layer) ---------- */
-export function ThermalGIS({ zones, zone, setZone }: { zones: Zone[]; zone: Zone; setZone: (id: string) => void }) {
+export function ThermalGIS({ zones, zone, setZone, onAreaSelect }: { zones: Zone[]; zone: Zone; setZone: (id: string) => void; onAreaSelect?: (z: Zone) => void }) {
   const [layer, setLayer] = useState<MapLayer>('thermal');
   const [query, setQuery] = useState('');
   const filtered = zones.filter(z => z.name.toLowerCase().includes(query.toLowerCase()) || z.ward.toLowerCase().includes(query.toLowerCase()));
@@ -19,6 +22,10 @@ export function ThermalGIS({ zones, zone, setZone }: { zones: Zone[]; zone: Zone
         <SectionTitle kicker="THERMAL GIS" title="HYDERABAD — REAL MAP, MULTI-LAYER" right={<DemoBadge label="LIVE MAP · DEMO LAYERS" />} />
         <div className="grid gap-4 px-4 pb-5 lg:grid-cols-3">
           <div className="lg:col-span-2">
+            <div className="mb-2">
+              <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-1">SEARCH AREA</p>
+              <AreaSearch onSelect={(z) => { onAreaSelect?.(z); setZone(z.id); }} placeholder="Search any Hyderabad area…" />
+            </div>
             <div className="relative mb-2">
               <Search size={14} className="absolute left-3 top-3 text-slate-400" />
               <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search ward / zone…" className="w-full rounded-xl border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm focus:border-heat focus:outline-none" />
@@ -48,9 +55,14 @@ export function ThermalGIS({ zones, zone, setZone }: { zones: Zone[]; zone: Zone
   );
 }
 
-/* ---------- Vulnerability Model ---------- */
+/* ---------- Vulnerability Model (interactive) ---------- */
 export function VulnerabilityModel({ profile, zone }: { profile: Profile; zone: Zone }) {
-  const risk = assessRisk(profile, zone);
+  const baseRisk = assessRisk(profile, zone);
+  const [hours, setHours] = useState(profile.outdoorHours);
+  const [shade, setShade] = useState(profile.shadeAccess);
+  const [activity, setActivity] = useState(profile.activity);
+  const scenarioProfile = { ...profile, outdoorHours: hours, shadeAccess: shade, activity };
+  const risk = assessRisk(scenarioProfile, zone);
   const data = [
     { name: 'Hazard', value: risk.hazard, max: 50 },
     { name: 'Exposure', value: risk.exposure, max: 30 },
@@ -59,7 +71,7 @@ export function VulnerabilityModel({ profile, zone }: { profile: Profile; zone: 
   return (
     <div className="mx-auto max-w-[1440px] space-y-4 px-3 py-4 sm:px-5">
       <Card>
-        <SectionTitle kicker="EXPLAINABLE AI" title="VULNERABILITY MODEL — FEATURE CONTRIBUTIONS" right={<DemoBadge label="DEMO MODEL" />} />
+        <SectionTitle kicker="EXPLAINABLE AI" title="VULNERABILITY MODEL — EXPLORE YOUR RISK" right={<DemoBadge label="DEMO MODEL" />} />
         <div className="grid gap-4 px-4 pb-5 lg:grid-cols-2">
           <div className="rounded-2xl border border-slate-200 bg-white/70 p-3">
             <ResponsiveContainer width="100%" height={260}>
@@ -70,10 +82,26 @@ export function VulnerabilityModel({ profile, zone }: { profile: Profile; zone: 
             </ResponsiveContainer>
             <p className="text-[10px] text-slate-500">Baseline weighted model (SHAP-ready feature schema). Not a trained ML model — labelled DEMO.</p>
           </div>
-          <div className="space-y-2">
-            <h3 className="text-xs font-bold tracking-widest text-navy">TOP CONTRIBUTORS FOR THIS PROFILE</h3>
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold tracking-widest text-navy">INTERACTIVE SCENARIO</h3>
+            <div className="rounded-xl bg-mist p-3 text-[11px] text-slate-600">
+              Adjust the sliders to see how your risk changes. Current: <b className="text-navy">{risk.total}/100 ({risk.tier})</b>
+              {risk.total !== baseRisk.total && <span className="ml-1 text-heat">(baseline {baseRisk.total})</span>}
+            </div>
+            <label className="block text-xs font-semibold text-navy">Outdoor hours: {hours}h
+              <input type="range" min={0} max={12} value={hours} onChange={e => setHours(+e.target.value)} className="w-full accent-heat" />
+            </label>
+            <label className="block text-xs font-semibold text-navy">Activity level
+              <select value={activity} onChange={e => setActivity(e.target.value as any)} className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs">
+                {['low','moderate','high','very_high'].map(a => <option key={a} value={a}>{a}</option>)}
+              </select>
+            </label>
+            <label className="flex items-center gap-2 text-xs font-semibold text-navy">
+              <input type="checkbox" checked={shade} onChange={e => setShade(e.target.checked)} className="accent-heat" /> Shade access
+            </label>
+            <h3 className="text-xs font-bold tracking-widest text-navy mt-2">TOP CONTRIBUTORS</h3>
             {risk.factors.slice(0, 6).map(f => <BarRow key={f.label} label={f.label} value={Math.abs(f.contribution)} max={12} display={`${f.contribution > 0 ? '+' : ''}${f.contribution} — ${f.note}`} />)}
-            <p className="rounded-xl bg-mist p-3 text-[11px] text-slate-600">Model inputs: LST proxy {zone.env.lst}°C, NDVI {zone.env.ndvi}, built-up {Math.round(zone.env.builtup * 100)}%, heat index {zone.env.heatIndex}°C, wet-bulb {zone.env.wetBulb}°C, UV {zone.env.uvIndex}. Swap in Random Forest / XGBoost + SHAP when labelled training data is available (backend /ml module).</p>
+            <p className="rounded-xl bg-mist p-3 text-[11px] text-slate-600">Model inputs: LST proxy {zone.env.lst}°C, NDVI {zone.env.ndvi}, built-up {Math.round(zone.env.builtup * 100)}%, heat index {zone.env.heatIndex}°C, wet-bulb {zone.env.wetBulb}°C, UV {zone.env.uvIndex}. Swap in Random Forest / XGBoost + SHAP when labelled training data is available.</p>
           </div>
         </div>
       </Card>
@@ -84,11 +112,23 @@ export function VulnerabilityModel({ profile, zone }: { profile: Profile; zone: 
 /* ---------- Cool Shelters ---------- */
 export function CoolShelters({ zone }: { zone: Zone }) {
   const [q, setQ] = useState(''); const [type, setType] = useState('all');
-  const list = FACILITIES.filter(f => f.zoneId === zone.id && (type === 'all' || f.type === type) && f.name.toLowerCase().includes(q.toLowerCase()));
+  // Find nearest preset zone with facilities (fallback for custom/searched locations).
+  const nearestZone = useMemo(() => {
+    if (ZONES.some(z => z.id === zone.id)) return ZONES.find(z => z.id === zone.id)!;
+    let best = ZONES[0], bestD = Infinity;
+    for (const z of ZONES) { const d = haversineKm(zone.lat, zone.lng, z.lat, z.lng); if (d < bestD) { bestD = d; best = z; } }
+    return best;
+  }, [zone]);
+  const usingFallback = nearestZone.id !== zone.id;
+  const baseList = FACILITIES.filter(f => f.zoneId === nearestZone.id);
+  const list = baseList
+    .map(f => ({ ...f, distanceKm: +haversineKm(zone.lat, zone.lng, nearestZone.lat + f.distanceKm * 0.004, nearestZone.lng + f.distanceKm * 0.004).toFixed(2) }))
+    .filter(f => (type === 'all' || f.type === type) && f.name.toLowerCase().includes(q.toLowerCase()));
   return (
     <div className="mx-auto max-w-[1440px] space-y-4 px-3 py-4 sm:px-5">
       <Card>
         <SectionTitle kicker="COOL SHELTERS" title={`NEAR ${zone.name.toUpperCase()}`} right={<DemoBadge />} />
+        {usingFallback && <p className="px-4 pb-2 text-[11px] text-amber-700">No facility data for this exact area — showing nearest mapped zone: <b>{nearestZone.name}</b>. Distances are approximate.</p>}
         <div className="flex flex-wrap gap-2 px-4 pb-3">
           <div className="relative flex-1 min-w-[180px]"><Search size={14} className="absolute left-3 top-2.5 text-slate-400" /><input value={q} onChange={e => setQ(e.target.value)} placeholder="Search facilities…" className="w-full rounded-full border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm focus:border-heat focus:outline-none" /></div>
           {['all', 'shelter', 'hospital', 'park', 'water'].map(t => <button key={t} onClick={() => setType(t)} className={`rounded-full px-3 py-1.5 text-xs font-bold capitalize ${type === t ? 'bg-navy text-white' : 'bg-mist text-slate-600'}`}>{t}</button>)}
@@ -104,9 +144,9 @@ export function CoolShelters({ zone }: { zone: Zone }) {
               </div>
             </div>
           ))}
-          {!list.length && <p className="px-4 pb-2 text-xs text-slate-500">No facilities match. Widen the search.</p>}
+          {!list.length && <p className="px-4 pb-2 text-xs text-slate-500">No facilities match. Widen the search or switch type.</p>}
         </div>
-        <p className="px-4 pb-4 text-[10px] text-slate-400">DEMO facility entries — do not navigate to these without verifying with GHMC / OpenStreetMap. Production: Overpass API + PostGIS facilities table.</p>
+        <p className="px-4 pb-4 text-[10px] text-slate-400">DEMO facility entries — verify with GHMC / OpenStreetMap before use. Production: Overpass API + PostGIS facilities table.</p>
       </Card>
     </div>
   );

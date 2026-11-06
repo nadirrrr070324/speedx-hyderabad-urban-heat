@@ -42,7 +42,7 @@ export default function ThermalGISMap({ zones, zone, setZone, layer, onLayer }: 
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
-    const map = L.map(ref.current, { zoomControl: true, scrollWheelZoom: true }).setView(HYDERABAD, 11);
+    const map = L.map(ref.current, { zoomControl: true, scrollWheelZoom: true, dragging: true, doubleClickZoom: true, boxZoom: true, keyboard: true }).setView(HYDERABAD, 11);
     mapRef.current = map;
     baseRef.current = L.tileLayer(TILES.terrain.url, { attribution: TILES.terrain.attr, maxZoom: 19 }).addTo(map);
     layerGroupRef.current = L.layerGroup().addTo(map);
@@ -105,10 +105,8 @@ export default function ThermalGISMap({ zones, zone, setZone, layer, onLayer }: 
     }
   }, [layer, zones, zone, setZone]);
 
-  // Fly to active zone
-  useEffect(() => {
-    mapRef.current?.flyTo([zone.lat, zone.lng], 12, { duration: 1.2 });
-  }, [zone.id]);
+// Recenter on demand (button) instead of auto-fly, so users can pan/zoom freely.
+  const recenter = () => { mapRef.current?.setView([zone.lat, zone.lng], 12, { animate: true }); };
 
   const LAYERS: { id: MapLayer; label: string }[] = [
     { id: 'terrain', label: 'OSM Streets' }, { id: 'satellite', label: 'Satellite' },
@@ -119,11 +117,12 @@ export default function ThermalGISMap({ zones, zone, setZone, layer, onLayer }: 
 
   return (
     <div>
-      <div className="mb-2 flex flex-wrap gap-1.5" role="tablist" aria-label="Map layers">
+      <div className="mb-2 flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Map layers">
         {LAYERS.map(l => (
           <button key={l.id} role="tab" aria-pressed={layer === l.id} onClick={() => onLayer(l.id)}
             className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase ${layer === l.id ? 'border-heat bg-orange-50 text-heat' : 'border-slate-300 text-slate-500 hover:bg-mist'}`}>{l.label}</button>
         ))}
+        <button onClick={recenter} className="ml-auto rounded-full border border-navy px-2.5 py-1 text-[10px] font-bold text-navy hover:bg-mist">⌖ Recenter</button>
       </div>
       <div ref={ref} className="h-[380px] w-full overflow-hidden rounded-2xl border border-navy [&_.leaflet-container]:h-full" aria-label="Hyderabad thermal GIS map" />
       <div id="gis-legend" className="mt-2 text-[11px] text-slate-600"><span className="font-bold text-navy">Legend:</span> coloured markers = monitoring zones (colour by risk). Floating blobs = selected layer (DEMO proxy).</div>

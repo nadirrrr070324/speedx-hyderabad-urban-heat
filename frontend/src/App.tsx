@@ -35,13 +35,14 @@ export default function App() {
 
   const allZones = useMemo(() => (custom ? [custom, ...ZONES] : ZONES), [custom]);
   const zone = allZones.find(z => z.id === zoneId) ?? allZones[0];
-  const { liveZone, weather, loading, forecast: liveForecast, lastUpdated } = useLiveWeather(zone, autoCloud, setCloud, refreshTick);
+  const { liveZone, weather, loading, forecast: liveForecast, lastUpdated, offline } = useLiveWeather(zone, autoCloud, setCloud, refreshTick);
   const effZone = liveZone ?? zone;
   const risk = useMemo(() => assessRisk(profile, effZone), [profile, effZone]);
   const forecast = useMemo(() => (liveForecast.length ? liveForecast : demoForecast(zone)), [liveForecast, zone]);
 
   useEffect(() => { setProfile(p => ({ ...p, zoneId })); }, [zoneId]);
 
+const handleAreaSelect = (z: Zone) => { setCustom(z); setZoneId(z.id); };
   const advisory = `${effZone.name}: heat index ${effZone.env.heatIndex.toFixed(1)}°C — ${risk.tier} personal risk. Avoid 11:00–16:00 outdoor work.`;
 
   return (
@@ -49,6 +50,7 @@ export default function App() {
       <Header view={view} setView={setView} advisory={advisory}
         locationSlot={<LocationQuickBtn onFix={setFix} custom={custom} onCustom={setCustom} onSelect={setZoneId} geoState={geoState} onGeoState={setGeoState} zones={ZONES} />} />
       <main>
+        {offline && <div className="mx-auto max-w-[1440px] px-3 pt-3 sm:px-5"><div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-2 text-xs font-semibold text-amber-800">You are offline — showing cached weather/forecast for {effZone.name}. Search and live data will resume when connected.</div></div>}
         <div className="mx-auto max-w-[1440px] px-3 pt-3 sm:px-5">
           <LocationSwitch zones={ZONES} active={effZone} onSelect={setZoneId} custom={custom} onCustom={setCustom}
             fix={fix} watch={watch} onWatch={setWatch} onFix={setFix} geoState={geoState} onGeoState={setGeoState} />
@@ -57,6 +59,7 @@ export default function App() {
           <>
             <Overview zone={effZone} risk={risk} profile={profile} cloud={cloud} setCloud={c => { setAutoCloud(false); setCloud(c); }}
               onCheckRisk={() => setView('vulnerability')} onExplore3D={() => setView('gis')} setZone={setZoneId} zones={allZones}
+              onAreaSelect={handleAreaSelect}
               liveWeather={weather} liveForecast={forecast} liveLoading={loading} autoCloud={autoCloud} setAutoCloud={setAutoCloud}
               onRefresh={() => setRefreshTick(t => t + 1)} liveUpdated={lastUpdated} refreshTick={refreshTick} />
             <SevenDayOutlook forecast={forecast} onDetail={() => setView('forecast')} />
@@ -69,7 +72,7 @@ export default function App() {
           <VulnerabilityModel profile={profile} zone={effZone} />
           </>
         )}
-        {view === 'gis' && <ThermalGIS zones={ZONES} zone={effZone} setZone={setZoneId} />}
+        {view === 'gis' && <ThermalGIS zones={allZones} zone={effZone} setZone={setZoneId} onAreaSelect={handleAreaSelect} />}
         {view === 'shelters' && <CoolShelters zone={effZone} />}
         {view === 'outlook' && <ForecastDetail zone={effZone} liveForecast={liveForecast} />}
         {view === 'forecast' && <ForecastDetail zone={effZone} liveForecast={liveForecast} />}

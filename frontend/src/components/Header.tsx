@@ -28,18 +28,18 @@ export default function Header({ view, setView, advisory, locationSlot }: { view
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/70 glass">
-      <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-3 py-2 sm:px-5">
+      <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-3 py-3 sm:px-5">
         <button onClick={() => setView('overview')} className="flex items-center gap-2 text-left">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-navy text-white"><Flame size={18} className="text-heat" /></span>
+          <span className="grid h-11 w-11 place-items-center rounded-xl bg-navy text-white"><Flame size={20} className="text-heat" /></span>
           <span className="leading-none">
-            <span className="font-headline block text-lg font-extrabold tracking-tight text-navy">SPEEDX <span className="heat-text">HEAT INTEL</span></span>
-            <span className="block text-[9px] font-bold tracking-[0.18em] text-slate-500">HYDERABAD URBAN OBSERVATORY</span>
+            <span className="font-headline block text-2xl font-extrabold tracking-tight text-navy">SPEEDX <span className="heat-text">HEAT INTEL</span></span>
+            <span className="block text-[10px] font-bold tracking-[0.18em] text-slate-500">HYDERABAD URBAN OBSERVATORY</span>
           </span>
         </button>
 
         <nav className="ml-4 hidden items-center gap-1 lg:flex" aria-label="Primary">
           {NAV.map(n => (
-            <button key={n.id} onClick={() => setView(n.id)} className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${view === n.id ? 'bg-navy text-white' : 'text-slate-600 hover:bg-mist'}`}>{t(n.key)}</button>
+            <button key={n.id} onClick={() => setView(n.id)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${view === n.id ? 'bg-navy text-white' : 'text-slate-600 hover:bg-mist'}`}>{t(n.key)}</button>
           ))}
         </nav>
 
@@ -49,7 +49,7 @@ export default function Header({ view, setView, advisory, locationSlot }: { view
           <span className="hidden text-[11px] font-semibold text-slate-500 xl:block">{now.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })} · {now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
 
           <div className="relative">
-            <button aria-label="Notifications" onClick={() => { setNotifOpen(o => !o); setProfileOpen(false); }} className="relative grid h-8 w-8 place-items-center rounded-full bg-white border border-slate-200 hover:bg-mist">
+            <button aria-label="Notifications" onClick={() => { setNotifOpen(o => !o); setProfileOpen(false); }} className="relative grid h-10 w-10 place-items-center rounded-full bg-white border border-slate-200 hover:bg-mist">
               <Bell size={15} /><span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-critical ring-anim" />
             </button>
             {notifOpen && (
@@ -68,10 +68,8 @@ export default function Header({ view, setView, advisory, locationSlot }: { view
           </div>
 
           {locationSlot}
-
-          {locationSlot}
           <div className="relative">
-            <button aria-label="Profile" onClick={() => { setProfileOpen(o => !o); setNotifOpen(false); }} className="grid h-8 w-8 place-items-center rounded-full bg-navy text-white"><User size={15} /></button>
+            <button aria-label="Profile" onClick={() => { setProfileOpen(o => !o); setNotifOpen(false); }} className="grid h-10 w-10 place-items-center rounded-full bg-navy text-white"><User size={15} /></button>
             {profileOpen && (
               <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white card-shadow-lg p-2 z-50">
                 <p className="px-2 py-1 text-xs font-bold text-navy">{t('header.profile')}</p>
@@ -83,7 +81,7 @@ export default function Header({ view, setView, advisory, locationSlot }: { view
             )}
           </div>
 
-          <button aria-label="Menu" onClick={() => setMobile(m => !m)} className="grid h-8 w-8 place-items-center rounded-full bg-white border border-slate-200 lg:hidden">{mobile ? <X size={15} /> : <Menu size={15} />}</button>
+          <button aria-label="Menu" onClick={() => setMobile(m => !m)} className="grid h-10 w-10 place-items-center rounded-full bg-white border border-slate-200 lg:hidden">{mobile ? <X size={15} /> : <Menu size={15} />}</button>
         </div>
       </div>
       {mobile && (
@@ -96,3 +94,4 @@ export default function Header({ view, setView, advisory, locationSlot }: { view
     </header>
   );
 }
+

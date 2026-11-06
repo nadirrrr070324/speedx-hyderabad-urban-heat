@@ -1,0 +1,28 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      FRONTEND_ORIGIN: http://localhost:5173
+    depends_on:
+      - db
+      - redis
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: speedx
+      POSTGRES_USER: speedx
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+volumes:
+  pgdata:

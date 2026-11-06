@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #ff5a1f;
+  --heat: #f97316;
+  --critical: #ef233c;
+  --navy: #080e24;
+  --slate: #111827;
+  --atmo: #ddeaf5;
+  --cream: #f4ebdd;
+  --mist: #e8eef5;
+}
+
+* { scrollbar-width: thin; scrollbar-color: #c3d0de transparent; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: Inter, system-ui, sans-serif;
+  color: #111827;
+  background:
+    radial-gradient(1100px 500px at 85% -5%, rgba(255, 90, 31, 0.14), transparent 55%),
+    radial-gradient(900px 600px at -10% 30%, rgba(221, 234, 245, 0.9), transparent 60%),
+    linear-gradient(180deg, #eef4fb 0%, #f7f3ea 100%);
+  min-height: 100vh;
+}
+.font-display { font-family: "Space Grotesk", sans-serif; }
+.font-headline { font-family: Sora, sans-serif; }
+
+.glass { background: rgba(255,255,255,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.card-shadow { box-shadow: 0 10px 30px rgba(8, 14, 36, .08), 0 2px 8px rgba(8,14,36,.05); }
+.card-shadow-lg { box-shadow: 0 24px 60px rgba(8, 14, 36, .16), 0 4px 14px rgba(8,14,36,.08); }
+.heat-text { background: linear-gradient(90deg, #ff5a1f 0%, #ff7a18 45%, #ef233c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.heat-bar { background: linear-gradient(90deg, #fbbf24, #f97316, #ef233c); }
+.ring-anim { animation: pulse-ring 2.4s ease-out infinite; }
+@keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(239,35,60,.35);} 70% { box-shadow: 0 0 0 12px rgba(239,35,60,0);} 100% { box-shadow: 0 0 0 0 rgba(239,35,60,0);} }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* Cloud density wheel — rotates only while spinning */
+.cloud-wheel { transition: transform 1.2s cubic-bezier(.34,1.56,.64,1), opacity 1.2s ease; }
+.cloud-spin-slow { animation: cloud-spin 26s linear infinite; }
+.cloud-spin-fast { animation: cloud-spin 9s linear infinite; }
+.cloud-bob { animation: cloud-bob 5s ease-in-out infinite; }
+@keyframes cloud-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes cloud-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { * { animation-duration: .001s !important; transition-duration: .001s !important; } }
+
+/* ---- Accessibility modes (toggled from A11yBar, persisted to localStorage) ---- */
+/* High contrast: darker text, stronger borders, no translucency */
+.a11y-contrast body { color: #000; background: #fff; }
+.a11y-contrast .glass { background: #fff !important; backdrop-filter: none; border-color: #9aa7b8 !important; }
+.a11y-contrast .text-slate-400, .a11y-contrast .text-slate-500, .a11y-contrast .text-slate-600 { color: #334155 !important; }
+.a11y-contrast .border-slate-200, .a11y-contrast .border-slate-300 { border-color: #64748b !important; }
+.a11y-contrast .heat-text { background: none !important; color: #b91c1c !important; -webkit-text-fill-color: #b91c1c; }
+.a11y-contrast img, .a11y-contrast canvas { filter: contrast(1.15); }
+/* Large text */
+.a11y-large body { font-size: 118%; }
+.a11y-large .text-\[10px\] { font-size: 12px !important; }
+.a11y-large .text-\[11px\] { font-size: 13px !important; }
+.a11y-large .text-xs { font-size: 14px !important; }
+.a11y-large .text-sm { font-size: 16px !important; }
+/* Reduce motion: kill all animation/transitions */
+.a11y-motion-off *, .a11y-motion-off *::before, .a11y-motion-off *::after {
+  animation-duration: .001s !important; animation-iteration-count: 1 !important;
+  transition-duration: .001s !important; scroll-behavior: auto !important;
+}
+.a11y-motion-off .cloud-spin-slow, .a11y-motion-off .cloud-spin-fast, .a11y-motion-off .cloud-bob, .a11y-motion-off .ring-anim { animation: none !important; }
+/* Focus rings: visible by default, off only when user disables */
+html { outline-offset: 2px; }
+.a11y-focus-off :focus { outline: none !important; box-shadow: none !important; }
+:focus-visible { outline: 3px solid #f97316; outline-offset: 2px; border-radius: 6px; }
+.a11y-focus-off :focus-visible { outline: none !important; }
+/* RTL support for Urdu */
+[dir="rtl"] .flip-rtl { transform: scaleX(-1); }

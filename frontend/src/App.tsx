@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Header, { type View } from './components/Header';
-import Overview from './components/Overview';
+import RedesignedOverview from './components/NewOverview';
 import PersonalRisk from './components/PersonalRisk';
 import { ThermalGIS, VulnerabilityModel, CoolShelters, Municipality, Employer, ForecastDetail } from './components/Modules';
 import SevenDayOutlook from './components/SevenDayOutlook';
@@ -24,7 +24,7 @@ export default function App() {
   const [zoneId, setZoneId] = useState('charminar');
   const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
   const [cloud, setCloud] = useState<CloudState>(CLOUD_STATES[0]);
-  const [autoCloud, setAutoCloud] = useState(true);
+  const [autoCloud] = useState(true);
   const [refreshTick, setRefreshTick] = useState(0);
   const [custom, setCustom] = useState<Zone | null>(null);
   const [fix, setFix] = useState<GeoFix | null>(null);
@@ -57,11 +57,9 @@ const handleAreaSelect = (z: Zone) => { setCustom(z); setZoneId(z.id); };
         </div>
         {view === 'overview' && (
           <>
-            <Overview zone={effZone} risk={risk} profile={profile} cloud={cloud} setCloud={c => { setAutoCloud(false); setCloud(c); }}
-              onCheckRisk={() => setView('vulnerability')} onExplore3D={() => setView('gis')} setZone={setZoneId} zones={allZones}
+            <RedesignedOverview zone={effZone} risk={risk} cloud={cloud} setZone={setZoneId}
               onAreaSelect={handleAreaSelect}
-              liveWeather={weather} liveForecast={forecast} liveLoading={loading} autoCloud={autoCloud} setAutoCloud={setAutoCloud}
-              onRefresh={() => setRefreshTick(t => t + 1)} liveUpdated={lastUpdated} refreshTick={refreshTick} />
+              liveWeather={weather} liveLoading={loading} liveUpdated={lastUpdated} onRefresh={() => setRefreshTick(t => t + 1)} />
             <SevenDayOutlook forecast={forecast} onDetail={() => setView('forecast')} />
           </>
         )}
